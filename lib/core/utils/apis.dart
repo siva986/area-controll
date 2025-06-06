@@ -1,0 +1,13 @@
+enum NetworkEndPoints {
+  baseUrl(path: /*  "http://localhost:5000"  */ 'https://node-nightmodelv2.onrender.com'),
+  getAllAreas(path: '/area/fetcharea'),
+  saveArea(path: '/area/createarea'),
+  deleteArea(path: '/area/delete_area/'),
+
+  ///Stop
+  createStop(path: '/stop/create'),
+  getAllStops(path: '/stop/stops');
+
+  final String path;
+  const NetworkEndPoints({required this.path});
+}

@@ -1,0 +1,30 @@
+[
+    {
+        "_id": "1234567890abcdef",
+        "name": "Example JSON Document",
+        "near": [
+            {
+                "_id": "1234567890abcdef",
+                "name": "Central Park"
+            },
+            {
+                "_id": "1234567890abcdef",
+                "name": "Times Square"
+            }
+        ]
+    },
+    {
+        "_id": "1234567890abcdef",
+        "name": "Example JSON Document",
+        "near": [
+            {
+                "_id": "1234567890abcdef",
+                "name": "Central Park"
+            },
+            {
+                "_id": "1234567890abcdef",
+                "name": "Times Square"
+            }
+        ]
+    }
+]
