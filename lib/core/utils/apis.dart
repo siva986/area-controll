@@ -6,6 +6,7 @@ enum NetworkEndPoints {
 
   ///Stop
   createStop(path: '/stop/create'),
+  updateNearestStop(path: '/stop/update-nearby'),
   getAllStops(path: '/stop/stops');
 
   final String path;

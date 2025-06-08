@@ -54,6 +54,10 @@ class StopsModel {
         "geo": geo!.toJson(),
         "live": live,
       };
+  Map<String, dynamic> toNearBy() => {
+        "_id": id,
+        "nearStops": List<dynamic>.from(nearStops.map((x) => x)),
+      };
 }
 
 class Geo {

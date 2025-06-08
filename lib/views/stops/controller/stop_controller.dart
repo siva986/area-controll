@@ -100,12 +100,27 @@ class StopController extends GetxController {
     });
   }
 
-  List<StopsModel> nearByStops = <StopsModel>[];
   RxBool chnageNearStops = false.obs;
 
-  onselectQuery(StopsModel stop, int index) {
-    stopLst[index].nearStops = stopLst[index].nearStops.toList();
-    stopLst[index].nearStops.add(stop.id);
+  selectNearBy(int index) {
+    StopsModel nearByStop = stopLst[index];
+    nearByStop.nearStops = nearByStop.nearStops.toList();
+    nearByStop.nearStops.add(stop.value!.id);
+    int curIndex = stopLst.indexWhere((e) => e.id == stop.value!.id);
+    stop.value!.nearStops = stop.value!.nearStops.toList();
+    stop.value!.nearStops.addIf(stop.value!.nearStops.contains(nearByStop.id) == false, nearByStop.id);
+    stopLst[curIndex] == stop.value!;
     stopLst.refresh();
+  }
+
+  saveNearByStops() {
+    if (stop.value == null) return;
+    _repo.updateNearestStop(stop.value!).then((stops) {
+      for (var stop in stops) {
+        int index = stopLst.indexWhere((e) => e.id == stop.id);
+        stopLst[index] = stop;
+      }
+      stop.value = null;
+    });
   }
 }

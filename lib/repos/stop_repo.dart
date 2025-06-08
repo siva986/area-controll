@@ -15,11 +15,11 @@ class StopRepo {
     });
   }
 
-  // Future<AreaModel> deleteArea(String id) {
-  //   return ApiHelper(NetworkEndPoints.deleteArea.path + id).delete.then((res) {
-  //     return AreaModel.fromJson(res.data);
-  //   });
-  // }
+  Future<List<StopsModel>> updateNearestStop(StopsModel stop) {
+    return ApiHelper(NetworkEndPoints.updateNearestStop.path, parms: stop.toNearBy()).post.then((res) {
+      return (res.data as List).map((e) => StopsModel.fromJson(e)).toList();
+    });
+  }
 
   Future<StopsModel> saveStop(StopsModel stop) {
     var parms = stop.toParms();

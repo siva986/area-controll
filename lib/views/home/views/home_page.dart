@@ -7,13 +7,9 @@ import 'package:area_control/views/area/provider/area_controller.dart';
 import 'package:area_control/views/home/controller/home_controller.dart';
 import 'package:area_control/views/stops/controller/stop_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:get/get.dart';
-// import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:latlong2/latlong.dart';
-
-import '../../stops/utils/stop_dialog.dart';
 
 class HomePage extends GetView<HomeController> {
   const HomePage({super.key, required this.child});
@@ -211,20 +207,33 @@ class HomePage extends GetView<HomeController> {
                   return Marker(
                     point: _stop.geo!.coordinates,
                     child: InkWell(
-                        onTap: () {
-                          stopCrtl.stop.value = _stop;
-                          stopCrtl.tapPosition.value = controller.curcerPosition.value;
-                        },
-                        onDoubleTap: () {
+                      onTap: () {
+                        stopCrtl.stop.value = _stop;
+                        stopCrtl.tapPosition.value = controller.curcerPosition.value;
+                      },
+                      onDoubleTap: () {
+                        if (stopCrtl.chnageNearStops.value) {
+                          stopCrtl.selectNearBy(index);
+                        } else {
                           if (stopCrtl.updateIndex.value != null) {
                             stopCrtl.clearStop();
                           } else {
                             stopCrtl.updateIndex.value = index;
                           }
-                        },
-                        child: Tooltip(
-                            message: _stop.name,
-                            child: Icon(Icons.location_on_rounded, color: _stop.id == stop?.id ? Colors.redAccent : Colors.blue))),
+                        }
+                      },
+                      child: Tooltip(
+                        message: _stop.name,
+                        child: Icon(
+                          Icons.location_on_rounded,
+                          color: _stop.id == stop?.id
+                              ? Colors.redAccent
+                              : stop?.nearStops.contains(_stop.id) == true
+                                  ? Colors.green
+                                  : Colors.blue,
+                        ),
+                      ),
+                    ),
                   );
                 },
               )

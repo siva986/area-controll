@@ -57,7 +57,20 @@ class LocalBusStopsPage extends GetView<StopController> {
                               controller.stop.value?.name,
                               size: 10,
                               color: scaffoldBackgroundColor,
-                            )
+                            ),
+                          if (controller.chnageNearStops.value)
+                            if (controller.stop.value != null)
+                              InkWell(
+                                onTap: () {
+                                  controller.saveNearByStops();
+                                },
+                                child: const Headline(
+                                  'Update',
+                                  size: 10,
+                                  color: scaffoldBackgroundColor,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              )
                         ],
                       ),
                     ),
