@@ -42,6 +42,9 @@ class HomePage extends GetView<HomeController> {
                       options: MapOptions(
                         initialZoom: 10.5,
                         initialCenter: const LatLng(17.417547, 78.475196),
+                        onMapReady: () {
+                          controller.getintialPosition();
+                        },
                         onTap: (tapPosition, point) {
                           controller.onTapPoint.value = point;
                           stopCrtl.onTapMap(tapPosition, point);
@@ -53,6 +56,7 @@ class HomePage extends GetView<HomeController> {
                           stopCrtl.updateStopLocation(point);
                         },
                         onPositionChanged: (camera, hasGesture) {
+                          controller.saveCurrentPosition(camera);
                           if (hasGesture) {
                             stopCrtl.clearStop();
                           }
@@ -196,33 +200,35 @@ class HomePage extends GetView<HomeController> {
   List<Widget> stopWidgets() {
     final stopCrtl = Get.find<StopController>();
     return [
-      Obx(() {
-        final stopMap = {for (var stop in stopCrtl.stopLst) stop.id: stop};
+      // Obx(() {
+      //   final stopMap = {for (var stop in stopCrtl.stopLst) stop.id: stop};
 
-        final List<Polyline> polylines = [];
+      //   final List<Polyline> polylines = [];
 
-        for (var stop in stopCrtl.stopLst) {
-          final fromCoords = stop.geo!.coordinates;
+      //   for (var stop in stopCrtl.stopLst) {
+      //     final fromCoords = stop.geo!.coordinates;
 
-          for (var nearId in stop.nearStops) {
-            final nearStop = stopMap[nearId];
-            if (nearStop != null) {
-              final toCoords = nearStop.geo!.coordinates;
+      //     for (var nearId in stop.nearStops) {
+      //       final nearStop = stopMap[nearId];
+      //       if (nearStop != null) {
+      //         final toCoords = nearStop.geo!.coordinates;
 
-              // Optional: avoid duplicate A-B and B-A
-              if (stop.id.compareTo(nearId) < 0) {
-                polylines.add(Polyline(
-                  points: [fromCoords, toCoords],
-                  color: stop.id == stopCrtl.stop.value?.id ? Colors.green : Colors.white,
-                  strokeWidth: 4,
-                ));
-              }
-            }
-          }
-        }
+      //         // Optional: avoid duplicate A-B and B-A
+      //         if (stop.id.compareTo(nearId) < 0) {
+      //           polylines.add(Polyline(
+      //             points: [fromCoords, toCoords],
+      //             color: stop.id == stopCrtl.stop.value?.id ? Colors.green : Colors.white,
+      //             strokeWidth: 4,
+      //           ));
+      //         }
+      //       }
+      //     }
+      //   }
 
-        return PolylineLayer(polylines: polylines);
-      }),
+      //   return PolylineLayer(
+      //     polylines: polylines,
+      //   );
+      // }),
       Obx(
         () {
           StopsModel? stop = stopCrtl.stop.value;
@@ -260,10 +266,15 @@ class HomePage extends GetView<HomeController> {
                       },
                       child: Tooltip(
                           message: _stop.name,
-                          child: const CustomImage(
+                          child: CustomImage(
                             AppIcons.location,
+                            color: _stop.id == stop?.id
+                                ? Colors.redAccent
+                                : stop?.nearStops.contains(_stop.id) == true
+                                    ? Colors.green
+                                    : null,
                           )
-                          // Icon(
+                          //     Icon(
                           //   Icons.pin_drop,
                           //   color: _stop.id == stop?.id
                           //       ? Colors.redAccent
@@ -283,6 +294,3 @@ class HomePage extends GetView<HomeController> {
     ];
   }
 }
-
-// LatLng(latitude:17.417547, longitude:78.475196)
-// LatLngBounds(north: 17.668432034515472, south: 17.16766986786664, east: 78.8333342030127, west: 78.11567658044899)
