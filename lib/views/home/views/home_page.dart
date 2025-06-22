@@ -200,35 +200,53 @@ class HomePage extends GetView<HomeController> {
   List<Widget> stopWidgets() {
     final stopCrtl = Get.find<StopController>();
     return [
-      // Obx(() {
-      //   final stopMap = {for (var stop in stopCrtl.stopLst) stop.id: stop};
+      Obx(() {
+        final stopMap = {for (var stop in stopCrtl.stopLst) stop.id: stop};
 
-      //   final List<Polyline> polylines = [];
+        final List<Polyline> polylines = [];
 
-      //   for (var stop in stopCrtl.stopLst) {
-      //     final fromCoords = stop.geo!.coordinates;
+        for (var stop in stopCrtl.stopLst) {
+          final fromCoords = stop.geo!.coordinates;
 
-      //     for (var nearId in stop.nearStops) {
-      //       final nearStop = stopMap[nearId];
-      //       if (nearStop != null) {
-      //         final toCoords = nearStop.geo!.coordinates;
+          for (var nearId in stop.nearStops) {
+            final nearStop = stopMap[nearId];
+            if (nearStop != null) {
+              final toCoords = nearStop.geo!.coordinates;
 
-      //         // Optional: avoid duplicate A-B and B-A
-      //         if (stop.id.compareTo(nearId) < 0) {
-      //           polylines.add(Polyline(
-      //             points: [fromCoords, toCoords],
-      //             color: stop.id == stopCrtl.stop.value?.id ? Colors.green : Colors.white,
-      //             strokeWidth: 4,
-      //           ));
-      //         }
-      //       }
-      //     }
-      //   }
+              // Optional: avoid duplicate A-B and B-A
+              if (stop.id.compareTo(nearId) < 0) {
+                polylines.add(Polyline(
+                  points: [fromCoords, toCoords],
+                  color: stop.id == stopCrtl.stop.value?.id ? Colors.green : Colors.white,
+                  strokeWidth: 4,
+                ));
+              }
+            }
+          }
+        }
+        return PolylineLayer(
+          polylines: polylines,
+        );
+      }),
+      Obx(() {
+        StopsModel? stop = stopCrtl.stop.value;
 
-      //   return PolylineLayer(
-      //     polylines: polylines,
-      //   );
-      // }),
+        if (stop == null || stop.geo == null) {
+          return const SizedBox.shrink();
+        }
+
+        final vv = stopCrtl.stopLst.where((element) => stop.nearStops.contains(element.id)).toList();
+
+        return PolylineLayer(
+          polylines: [
+            ...vv.map((e) => Polyline(
+                  points: [e.geo!.coordinates, stop.geo!.coordinates],
+                  color: Colors.green,
+                  strokeWidth: 4,
+                ))
+          ],
+        );
+      }),
       Obx(
         () {
           StopsModel? stop = stopCrtl.stop.value;
@@ -245,8 +263,8 @@ class HomePage extends GetView<HomeController> {
                 (index) {
                   StopsModel _stop = stopCrtl.stopLst[index];
                   return Marker(
-                    width: 12,
-                    height: 12,
+                    width: 8,
+                    height: 8,
                     point: _stop.geo!.coordinates,
                     child: InkWell(
                       onTap: () {
