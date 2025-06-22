@@ -102,14 +102,12 @@ class StopController extends GetxController {
 
   RxBool chnageNearStops = false.obs;
 
-  selectNearBy(int index) {
-    StopsModel nearByStop = stopLst[index];
-    nearByStop.nearStops = nearByStop.nearStops.toList();
-    nearByStop.nearStops.add(stop.value!.id);
-    int curIndex = stopLst.indexWhere((e) => e.id == stop.value!.id);
-    stop.value!.nearStops = stop.value!.nearStops.toList();
-    stop.value!.nearStops.addIf(stop.value!.nearStops.contains(nearByStop.id) == false, nearByStop.id);
-    stopLst[curIndex] == stop.value!;
+  selectNearBy(StopsModel nearByStop) {
+    if (stop.value!.nearStops.contains(nearByStop.id)) {
+      stop.value!.nearStops.removeWhere((e) => e == nearByStop.id);
+    } else {
+      stop.value!.nearStops.addIf(stop.value!.nearStops.contains(nearByStop.id) == false, nearByStop.id);
+    }
     stopLst.refresh();
   }
 

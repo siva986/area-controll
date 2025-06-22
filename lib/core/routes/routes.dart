@@ -25,7 +25,7 @@ class AppRoute {
         ShellRoute(
           builder: (context, state, child) {
             HomeBinding().dependencies();
-            return HomePage(child: child);
+            return HomePage(state: state, child: child);
           },
           routes: [
             GoRoute(

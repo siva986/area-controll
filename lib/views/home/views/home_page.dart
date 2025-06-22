@@ -1,7 +1,9 @@
 import 'package:area_control/core/utils/colors.dart';
 import 'package:area_control/core/utils/consts.dart';
 import 'package:area_control/core/utils/enums.dart';
+import 'package:area_control/core/utils/images.dart';
 import 'package:area_control/models/stops.model.dart';
+import 'package:area_control/utils/common_image.dart';
 import 'package:area_control/utils/headline.dart';
 import 'package:area_control/views/area/provider/area_controller.dart';
 import 'package:area_control/views/home/controller/home_controller.dart';
@@ -9,12 +11,14 @@ import 'package:area_control/views/stops/controller/stop_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:get/get.dart';
+import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
 
 class HomePage extends GetView<HomeController> {
-  const HomePage({super.key, required this.child});
+  const HomePage({super.key, required this.child, required this.state});
 
   final Widget child;
+  final GoRouterState state;
 
   @override
   Widget build(BuildContext context) {
@@ -29,6 +33,9 @@ class HomePage extends GetView<HomeController> {
                 // final boundary = area?.boundary;
                 GetBuilder<AreaController>(
                   id: 'polygon',
+                  initState: (con) {
+                    controller.initSTad(state);
+                  },
                   builder: (context) {
                     return FlutterMap(
                       mapController: controller.mapController,
@@ -189,6 +196,33 @@ class HomePage extends GetView<HomeController> {
   List<Widget> stopWidgets() {
     final stopCrtl = Get.find<StopController>();
     return [
+      Obx(() {
+        final stopMap = {for (var stop in stopCrtl.stopLst) stop.id: stop};
+
+        final List<Polyline> polylines = [];
+
+        for (var stop in stopCrtl.stopLst) {
+          final fromCoords = stop.geo!.coordinates;
+
+          for (var nearId in stop.nearStops) {
+            final nearStop = stopMap[nearId];
+            if (nearStop != null) {
+              final toCoords = nearStop.geo!.coordinates;
+
+              // Optional: avoid duplicate A-B and B-A
+              if (stop.id.compareTo(nearId) < 0) {
+                polylines.add(Polyline(
+                  points: [fromCoords, toCoords],
+                  color: stop.id == stopCrtl.stop.value?.id ? Colors.green : Colors.white,
+                  strokeWidth: 4,
+                ));
+              }
+            }
+          }
+        }
+
+        return PolylineLayer(polylines: polylines);
+      }),
       Obx(
         () {
           StopsModel? stop = stopCrtl.stop.value;
@@ -205,6 +239,8 @@ class HomePage extends GetView<HomeController> {
                 (index) {
                   StopsModel _stop = stopCrtl.stopLst[index];
                   return Marker(
+                    width: 12,
+                    height: 12,
                     point: _stop.geo!.coordinates,
                     child: InkWell(
                       onTap: () {
@@ -213,7 +249,7 @@ class HomePage extends GetView<HomeController> {
                       },
                       onDoubleTap: () {
                         if (stopCrtl.chnageNearStops.value) {
-                          stopCrtl.selectNearBy(index);
+                          stopCrtl.selectNearBy(_stop);
                         } else {
                           if (stopCrtl.updateIndex.value != null) {
                             stopCrtl.clearStop();
@@ -223,16 +259,19 @@ class HomePage extends GetView<HomeController> {
                         }
                       },
                       child: Tooltip(
-                        message: _stop.name,
-                        child: Icon(
-                          Icons.location_on_rounded,
-                          color: _stop.id == stop?.id
-                              ? Colors.redAccent
-                              : stop?.nearStops.contains(_stop.id) == true
-                                  ? Colors.green
-                                  : Colors.blue,
-                        ),
-                      ),
+                          message: _stop.name,
+                          child: const CustomImage(
+                            AppIcons.location,
+                          )
+                          // Icon(
+                          //   Icons.pin_drop,
+                          //   color: _stop.id == stop?.id
+                          //       ? Colors.redAccent
+                          //       : stop?.nearStops.contains(_stop.id) == true
+                          //           ? Colors.green
+                          //           : Colors.blue,
+                          // ),
+                          ),
                     ),
                   );
                 },
@@ -240,7 +279,7 @@ class HomePage extends GetView<HomeController> {
             ],
           );
         },
-      )
+      ),
     ];
   }
 }

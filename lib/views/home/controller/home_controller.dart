@@ -14,6 +14,16 @@ class HomeController extends GetxController {
 
   DashboardTabs currentTab = DashboardTabs.area;
 
+  initSTad(GoRouterState state) {
+    final path = state.matchedLocation;
+    if (path == DashboardTabs.area.route.path) {
+      currentTab = DashboardTabs.area;
+    } else if (path == DashboardTabs.stops.route.path) {
+      currentTab = DashboardTabs.stops;
+    }
+    update();
+  }
+
   changeTab(BuildContext context, DashboardTabs tab) {
     currentTab = tab;
     context.go(tab.route.path);
