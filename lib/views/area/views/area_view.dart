@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:area_control/core/utils/colors.dart';
 import 'package:area_control/core/utils/images.dart';
 import 'package:area_control/models/area.model.dart';
@@ -28,7 +30,7 @@ class AreaView extends GetView<AreaController> {
             children: [
               Row(
                 mainAxisSize: MainAxisSize.min,
-                children: [ 
+                children: [
                   _buildPolygons(),
                   _buildListofAreas(),
                 ],

@@ -2,6 +2,7 @@ import 'package:area_control/core/services/bindings/area_binding.dart';
 import 'package:area_control/core/services/bindings/home_binding.dart';
 import 'package:area_control/core/utils/enums.dart';
 import 'package:area_control/views/area/views/area_view.dart';
+import 'package:area_control/views/bus/views/bus_view.dart';
 import 'package:area_control/views/home/views/home_page.dart';
 import 'package:area_control/views/stops/views/stops.dart';
 import 'package:flutter/material.dart';
@@ -45,6 +46,16 @@ class AppRoute {
                 return const Material(
                   type: MaterialType.transparency,
                   child: LocalBusStopsPage(),
+                );
+              },
+            ),
+            GoRoute(
+              path: AppRoutes.buses.path,
+              builder: (context, state) {
+                BusBinding().dependencies();
+                return const Material(
+                  type: MaterialType.transparency,
+                  child: BusesPage(),
                 );
               },
             ),

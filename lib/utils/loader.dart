@@ -31,6 +31,7 @@ Future loader(Future onProgrees, {String msg = 'Loading...'}) {
   );
 
   return onProgrees.whenComplete(() {
+    // ignore: use_build_context_synchronously
     Navigator.of(NavigatorService.globalContext).pop();
   });
 }

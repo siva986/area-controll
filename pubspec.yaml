@@ -41,6 +41,7 @@ dependencies:
   url_launcher:
   sliver_tools:
   gap:
+  intl:
   shared_preferences:
   flutter_map: 
   flutter_map_cancellable_tile_provider:

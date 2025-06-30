@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:area_control/core/utils/colors.dart';
 import 'package:area_control/core/utils/consts.dart';
 import 'package:area_control/core/utils/enums.dart';
@@ -217,7 +219,7 @@ class HomePage extends GetView<HomeController> {
               if (stop.id.compareTo(nearId) < 0) {
                 polylines.add(Polyline(
                   points: [fromCoords, toCoords],
-                  color: stop.id == stopCrtl.stop.value?.id ? Colors.green : Colors.white,
+                  color: stop.id == stopCrtl.stop.value?.id ? Colors.green : Colors.teal,
                   strokeWidth: 4,
                 ));
               }

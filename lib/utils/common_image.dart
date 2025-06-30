@@ -18,6 +18,7 @@ class CustomImage extends StatelessWidget {
         imageUrl,
         width: width,
         height: height,
+        // ignore: deprecated_member_use
         color: color,
         fit: fit!,
       );

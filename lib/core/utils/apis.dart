@@ -7,7 +7,10 @@ enum NetworkEndPoints {
   ///Stop
   createStop(path: '/stop/create'),
   updateNearestStop(path: '/stop/update-nearby'),
-  getAllStops(path: '/stop/stops');
+  getAllStops(path: '/stop/stops'),
+
+  saveBus(path: '/bus/bus'),
+  existedBuses(path: '/bus/existedBuses');
 
   final String path;
   const NetworkEndPoints({required this.path});
