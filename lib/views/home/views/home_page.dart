@@ -3,11 +3,10 @@
 import 'package:area_control/core/utils/colors.dart';
 import 'package:area_control/core/utils/consts.dart';
 import 'package:area_control/core/utils/enums.dart';
-import 'package:area_control/core/utils/images.dart';
 import 'package:area_control/models/stops.model.dart';
-import 'package:area_control/utils/common_image.dart';
 import 'package:area_control/utils/headline.dart';
 import 'package:area_control/views/area/provider/area_controller.dart';
+import 'package:area_control/views/bus/controller/bus_controller.dart';
 import 'package:area_control/views/home/controller/home_controller.dart';
 import 'package:area_control/views/stops/controller/stop_controller.dart';
 import 'package:flutter/material.dart';
@@ -73,7 +72,8 @@ class HomePage extends GetView<HomeController> {
                       children: [
                         TileLayer(urlTemplate: maplink),
                         if (controller.currentTab == DashboardTabs.area) ...areaWidgets(),
-                        if (controller.currentTab == DashboardTabs.stops) ...stopWidgets()
+                        if (controller.currentTab == DashboardTabs.stops) ...stopWidgets(),
+                        if (controller.currentTab == DashboardTabs.buses) ...busWidget(),
                       ],
                     );
                   },
@@ -101,6 +101,12 @@ class HomePage extends GetView<HomeController> {
             return InkWell(
               onTap: () {
                 controller.changeTab(context, dash);
+                if (controller.currentTab == DashboardTabs.buses) {
+                  final busCrtl = Get.find<BusController>();
+
+                  busCrtl.pageNo = 1;
+                  busCrtl.getAllStops();
+                }
               },
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
@@ -202,34 +208,30 @@ class HomePage extends GetView<HomeController> {
   List<Widget> stopWidgets() {
     final stopCrtl = Get.find<StopController>();
     return [
-      Obx(() {
-        final stopMap = {for (var stop in stopCrtl.stopLst) stop.id: stop};
-
-        final List<Polyline> polylines = [];
-
-        for (var stop in stopCrtl.stopLst) {
-          final fromCoords = stop.geo!.coordinates;
-
-          for (var nearId in stop.nearStops) {
-            final nearStop = stopMap[nearId];
-            if (nearStop != null) {
-              final toCoords = nearStop.geo!.coordinates;
-
-              // Optional: avoid duplicate A-B and B-A
-              if (stop.id.compareTo(nearId) < 0) {
-                polylines.add(Polyline(
-                  points: [fromCoords, toCoords],
-                  color: stop.id == stopCrtl.stop.value?.id ? Colors.green : Colors.teal,
-                  strokeWidth: 4,
-                ));
-              }
-            }
-          }
-        }
-        return PolylineLayer(
-          polylines: polylines,
-        );
-      }),
+      // Obx(() {
+      //   final stopMap = {for (var stop in stopCrtl.stopLst) stop.id: stop};
+      //   final List<Polyline> polylines = [];
+      //   for (var stop in stopCrtl.stopLst) {
+      //     final fromCoords = stop.geo!.coordinates;
+      //     for (var nearId in stop.nearStops) {
+      //       final nearStop = stopMap[nearId];
+      //       if (nearStop != null) {
+      //         final toCoords = nearStop.geo!.coordinates;
+      //         // Optional: avoid duplicate A-B and B-A
+      //         if (stop.id.compareTo(nearId) < 0) {
+      //           polylines.add(Polyline(
+      //             points: [fromCoords, toCoords],
+      //             color: stop.id == stopCrtl.stop.value?.id ? Colors.green : Colors.teal,
+      //             strokeWidth: 4,
+      //           ));
+      //         }
+      //       }
+      //     }
+      //   }
+      //   return PolylineLayer(
+      //     polylines: polylines,
+      //   );
+      // }),
       Obx(() {
         StopsModel? stop = stopCrtl.stop.value;
 
@@ -263,19 +265,19 @@ class HomePage extends GetView<HomeController> {
               ...List.generate(
                 stopCrtl.stopLst.length,
                 (index) {
-                  StopsModel _stop = stopCrtl.stopLst[index];
+                  StopsModel stop0 = stopCrtl.stopLst[index];
                   return Marker(
-                    width: 8,
-                    height: 8,
-                    point: _stop.geo!.coordinates,
+                    width: 12,
+                    height: 12,
+                    point: stop0.geo!.coordinates,
                     child: InkWell(
                       onTap: () {
-                        stopCrtl.stop.value = _stop;
+                        stopCrtl.stop.value = stop0;
                         stopCrtl.tapPosition.value = controller.curcerPosition.value;
                       },
                       onDoubleTap: () {
                         if (stopCrtl.chnageNearStops.value) {
-                          stopCrtl.selectNearBy(_stop);
+                          stopCrtl.selectNearBy(stop0);
                         } else {
                           if (stopCrtl.updateIndex.value != null) {
                             stopCrtl.clearStop();
@@ -285,24 +287,16 @@ class HomePage extends GetView<HomeController> {
                         }
                       },
                       child: Tooltip(
-                          message: _stop.name,
-                          child: CustomImage(
-                            AppIcons.location,
-                            color: _stop.id == stop?.id
-                                ? Colors.redAccent
-                                : stop?.nearStops.contains(_stop.id) == true
-                                    ? Colors.green
-                                    : null,
-                          )
-                          //     Icon(
-                          //   Icons.pin_drop,
-                          //   color: _stop.id == stop?.id
-                          //       ? Colors.redAccent
-                          //       : stop?.nearStops.contains(_stop.id) == true
-                          //           ? Colors.green
-                          //           : Colors.blue,
-                          // ),
-                          ),
+                        triggerMode: TooltipTriggerMode.longPress,
+                        message: stop0.name,
+                        child: LocationIcon(
+                          color: stop0.id == stop?.id
+                              ? Colors.redAccent
+                              : stop?.nearStops.contains(stop0.id) == true
+                                  ? Colors.green
+                                  : null,
+                        ),
+                      ),
                     ),
                   );
                 },
@@ -312,5 +306,91 @@ class HomePage extends GetView<HomeController> {
         },
       ),
     ];
+  }
+
+  List<Widget> busWidget() {
+    final busCrtl = Get.find<BusController>();
+    return [
+      GetBuilder<BusController>(
+        id: 'busMarker',
+        builder: (context) {
+          return busCrtl.busVariant.value != null
+              ? PolylineLayer(
+                  polylines: [
+                    Polyline(
+                      points: busCrtl.busVariant.value!.route.map((e) => e.geo!.coordinates).toList(),
+                      color: Colors.red,
+                      strokeWidth: 4,
+                    ),
+                  ],
+                )
+              : const SizedBox.shrink();
+        },
+      ),
+      Obx(
+        () {
+          // StopsModel? stop = busCrtl.stop.value;
+          return MarkerLayer(
+            markers: [
+              ...List.generate(
+                busCrtl.stopLst.length,
+                (index) {
+                  StopsModel stop0 = busCrtl.stopLst[index];
+                  return Marker(
+                    width: 10,
+                    height: 10,
+                    point: stop0.geo!.coordinates,
+                    child: GetBuilder<BusController>(
+                        id: 'busMarker',
+                        builder: (context) {
+                          bool isSelected = busCrtl.busVariant.value?.route.any((e) => e.id == stop0.id) == true;
+                          return InkWell(
+                            onTap: () {
+                              if (busCrtl.busVariant.value != null) {
+                                if (busCrtl.isShiftPressed.value) {
+                                  busCrtl.busVariant.value!.route = busCrtl.busVariant.value!.route.toList();
+                                  busCrtl.busVariant.value!.route.add(stop0);
+
+                                  busCrtl.update(['busMarker']);
+                                  print(busCrtl.busVariant.value!.route);
+                                }
+                              }
+                            },
+                            child: Tooltip(
+                              triggerMode: TooltipTriggerMode.longPress,
+                              message: stop0.name,
+                              child: LocationIcon(
+                                color: isSelected ? Colors.redAccent : null,
+                              ),
+                            ),
+                          );
+                        }),
+                  );
+                },
+              )
+            ],
+          );
+        },
+      ),
+    ];
+  }
+}
+
+class LocationIcon extends StatelessWidget {
+  const LocationIcon({super.key, this.color});
+
+  final Color? color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 30,
+      height: 30,
+      decoration: BoxDecoration(
+        color: color ?? Colors.green,
+        shape: BoxShape.circle,
+        border: Border.all(color: Colors.deepOrange, width: 2),
+      ),
+    );
   }
 }

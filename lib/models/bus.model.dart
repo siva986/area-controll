@@ -1,4 +1,5 @@
 import 'package:area_control/core/utils/enums.dart';
+import 'package:area_control/models/stops.model.dart';
 import 'package:flutter/material.dart';
 
 class BusModel {
@@ -23,8 +24,12 @@ class BusModel {
         name: json["name"],
         description: json["description"],
         tag: List<BusType>.from(json["tag"].map((x) => BusType.fromName(x))),
-        variants: List<BusVariants>.from(json["variants"].map((x) => BusVariants.fromJson(x))),
-        live: json["live"],
+        variants: json["variants"] == null
+            ? []
+            : List<BusVariants>.from(
+                json["variants"].map((x) => BusVariants.fromJson(x)),
+              ),
+        live: json["live"] ?? true,
       );
 
   Map<String, dynamic> toJson() => {
@@ -39,7 +44,6 @@ class BusModel {
         "name": name,
         "description": description,
         "tag": List<dynamic>.from(tag.map((x) => x.name)),
-        "variants": List<dynamic>.from(variants.map((x) => x.toJson())),
         "live": live,
       };
 }
@@ -50,7 +54,7 @@ class BusVariants {
   TimeOfDay? fromTime;
   TimeOfDay? toTime;
   int frequency;
-  List<String> route;
+  List<StopsModel> route;
 
   BusVariants({
     this.dayType = DayType.daily,
@@ -66,7 +70,7 @@ class BusVariants {
         fromTime: stringToTime(json["from"]),
         toTime: stringToTime(json["to"]),
         frequency: json["frequency"],
-        route: json["route"],
+        route: [],
       );
 
   static TimeOfDay stringToTime(int time) {

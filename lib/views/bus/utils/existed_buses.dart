@@ -13,6 +13,14 @@ Future<BusModel?> showExistedBuses(BuildContext context) {
     context: context,
     color: scaffoldBackgroundColor,
     shadowColor: Colors.white,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(5),
+    ),
+    constraints: const BoxConstraints(
+      maxHeight: 500,
+      minWidth: 300,
+      maxWidth: 300,
+    ),
     elevation: 2,
     menuPadding: EdgeInsets.zero,
     items: [
@@ -21,32 +29,59 @@ Future<BusModel?> showExistedBuses(BuildContext context) {
         child: GetBuilder<BusController>(
           builder: (crtl) {
             return Obx(() {
-              return Column(spacing: 5, children: [
-                InkWell(onTap: () => Navigator.pop(context), child: const Headline("Close")),
-                ...List.generate(
-                  crtl.existingBuses.length,
-                  (index) {
-                    return InkWell(
+              return Stack(
+                children: [
+                  SizedBox(
+                    width: 300,
+                    child: Column(
+                      spacing: 5,
+                      children: [
+                        const Gap(20),
+                        ...List.generate(
+                          crtl.existingBuses.length,
+                          (index) {
+                            return InkWell(
+                              onTap: () {
+                                Navigator.pop(context, crtl.existingBuses[index]);
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(3),
+                                  border: Border.all(color: const Color.fromARGB(255, 60, 60, 60)),
+                                ),
+                                margin: const EdgeInsets.symmetric(vertical: 5),
+                                padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                                child: Row(
+                                  children: [
+                                    Headline(crtl.existingBuses[index].name),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                  Positioned(
+                    top: 0,
+                    right: 0,
+                    child: InkWell(
                       onTap: () {
-                        Navigator.pop(context, crtl.existingBuses[index]);
+                        crtl.existingBuses.clear();
+                        Navigator.pop(context);
                       },
                       child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(3),
-                          border: Border.all(color: const Color.fromARGB(255, 60, 60, 60)),
-                        ),
-                        padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                        child: Row(
-                          children: [
-                            Headline(crtl.existingBuses[index].name),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                ),
-                const Gap(20),
-              ]);
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                          ),
+                          padding: const EdgeInsets.all(4),
+                          child: const Icon(Icons.close, size: 14, color: Colors.red)),
+                    ),
+                  ),
+                ],
+              );
             });
           },
         ),

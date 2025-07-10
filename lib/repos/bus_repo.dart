@@ -23,4 +23,8 @@ class BusRepo {
       return List.from((res.data as List).map((e) => BusModel.fromJson(e)));
     });
   }
+
+  Future<Responce> getAllBuses(Map<String, dynamic> parms) {
+    return ApiHelper(NetworkEndPoints.getAllBuses.path, parms: parms).post;
+  }
 }

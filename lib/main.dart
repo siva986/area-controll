@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       home: MaterialApp.router(
         title: 'Night Mode Controls',
-        debugShowCheckedModeBanner: true,
+        debugShowCheckedModeBanner: false,
         debugShowMaterialGrid: false,
         builder: (context, child) {
           NavigatorService.globalContext = context;

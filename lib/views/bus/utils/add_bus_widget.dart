@@ -21,6 +21,9 @@ class AddBusWidget extends GetView<BusController> {
         if (route == null) {
           return const SizedBox.shrink();
         }
+        if (controller.busVariant.value != null) {
+          return const SizedBox.shrink();
+        }
 
         return Positioned(
           top: 100,
@@ -88,6 +91,7 @@ class AddBusWidget extends GetView<BusController> {
                         suffixIconConstraints: const BoxConstraints(maxWidth: 20, maxHeight: 20),
                       ),
                       onEditingComplete: () {
+                        controller.existingBuses.clear();
                         controller.checkExistance().then((e) {
                           if (controller.existingBuses.isNotEmpty) {
                             showExistedBuses(context).then((value) {
@@ -161,11 +165,10 @@ class AddBusWidget extends GetView<BusController> {
                         const Headline('Add Variants'),
                         InkWell(
                           onTap: () {
-                            if (route!.id == "") {
+                            if (route?.id == "") {
                               return;
                             }
                             controller.busVariant.value = BusVariants();
-
                             controller.update(['variants']);
                           },
                           child: Container(

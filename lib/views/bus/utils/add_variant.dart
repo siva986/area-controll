@@ -90,14 +90,27 @@ class BusVariantWidget extends GetView<BusController> {
                               ],
                             );
                           }),
-                      TextField(
-                        controller: TextEditingController(text: busVariant!.frequency.toString()),
-                        style: const TextStyle(color: appWhite, fontSize: 13),
-                        cursorColor: Colors.white,
-                        decoration: const InputDecoration.collapsed(hintText: "Frequency ..."),
-                        onChanged: (value) {
-                          busVariant!.frequency = int.tryParse(value) ?? 5;
-                        },
+                      Row(
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              controller: TextEditingController(text: busVariant!.frequency.toString()),
+                              style: const TextStyle(color: appWhite, fontSize: 13),
+                              cursorColor: Colors.white,
+                              decoration: const InputDecoration.collapsed(hintText: "Frequency ..."),
+                              onChanged: (value) {
+                                busVariant!.frequency = int.tryParse(value) ?? 5;
+                              },
+                            ),
+                          ),
+                          GetBuilder<BusController>(
+                            id: 'busMarker',
+                            builder: (context) {
+                              print("object");
+                              return Headline(busVariant!.route.length, size: 14, color: appWhite);
+                            },
+                          ),
+                        ],
                       ),
                       GetBuilder<BusController>(
                         id: "dayType",
@@ -183,6 +196,19 @@ class BusVariantWidget extends GetView<BusController> {
                           child: const Headline("UPDATE"),
                         ),
                       ),
+                      InkWell(
+                        onTap: () {
+                          controller.busVariant.value = null;
+                          controller.variantOffset.value = const Offset(200, 150);
+                        },
+                        child: const Center(
+                          child: Headline(
+                            "Clear & Close",
+                            color: Colors.red,
+                            size: 10,
+                          ),
+                        ),
+                      )
                     ],
                   ),
                 ),
