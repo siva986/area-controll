@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:area_control/core/services/app/debouncer.dart';
 import 'package:area_control/core/utils/enums.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -16,6 +17,8 @@ class HomeController extends GetxController {
   late MapController mapController;
 
   DashboardTabs currentTab = DashboardTabs.area;
+
+  final debounceHover = Debouncer(delay: const Duration(milliseconds: 500));
 
   @override
   void onInit() {

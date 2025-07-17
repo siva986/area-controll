@@ -13,11 +13,13 @@ class BusController extends GetxController {
 
   final BusRepo busRepo = BusRepo();
 
-  Rxn<BusVariants> busVariant = Rxn<BusVariants>();
+  Rxn<BusVariantModel> busVariant = Rxn<BusVariantModel>();
 
   Rx<Offset> variantOffset = const Offset(200, 150).obs;
 
   RxBool isLstOpened = false.obs;
+
+  KeyEvent? keyEvent;
 
   Future<void> saveBus() {
     if (busDetails.value == null) throw Exception("Bus details are not set");
@@ -104,6 +106,36 @@ class BusController extends GetxController {
         pageNo = 1;
         return null;
       }
+    });
+  }
+
+  void saveVariant() {
+    if (busVariant.value == null) throw Exception("Bus variant is not set");
+    busRepo.saveRoute(busVariant.value!).then((res) {
+      for (var c in busesLst) {
+        if (c.id == busVariant.value!.route) {
+          c.variants = c.variants.toList();
+          c.variants.add(res);
+        }
+      }
+    }).then((c) {
+      busVariant.value = null;
+      variantOffset.value = const Offset(200, 150);
+      update(['busMarker', 'variants']);
+    });
+  }
+
+  getBus(String id) {
+    return busRepo.getBus(id).then((res) {
+      busDetails.value = res;
+    });
+  }
+
+  getVariant(String id) {
+    return busRepo.getVariant(id).then((res) {
+      busVariant.value = res;
+    }).whenComplete(() {
+      update(['busMarker']);
     });
   }
 }

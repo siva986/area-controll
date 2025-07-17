@@ -10,8 +10,11 @@ enum NetworkEndPoints {
   getAllStops(path: '/stop/stops'),
 
   saveBus(path: '/bus/bus'),
-  
+
   getAllBuses(path: '/bus/getBuses'),
+
+  saveRoute(path: '/route/route'),
+  
   existedBuses(path: '/bus/existedBuses');
 
   final String path;

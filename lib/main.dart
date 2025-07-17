@@ -18,6 +18,7 @@ class MyApp extends StatelessWidget {
         title: 'Night Mode Controls',
         debugShowCheckedModeBanner: false,
         debugShowMaterialGrid: false,
+        
         builder: (context, child) {
           NavigatorService.globalContext = context;
           return child!;

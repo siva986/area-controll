@@ -120,7 +120,8 @@ class AllRoutesWidget extends GetView<BusController> {
                                         title: Headline(route.name),
                                         subtitle: Headline(route.description, size: 10, color: Colors.grey),
                                         onTap: () {
-                                          controller.busDetails.value = route;
+                                          controller.getBus(route.id);
+                                          // controller.busDetails.value = route;
                                         },
                                       );
                                     });

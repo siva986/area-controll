@@ -20,16 +20,14 @@ class BusesPage extends GetView<BusController> {
       autofocus: true,
       onKeyEvent: (value) {
         if (value is KeyDownEvent) {
-          if (value.logicalKey == LogicalKeyboardKey.shiftLeft) {
-            print(value);
-            controller.isShiftPressed.value = true;
+          if (controller.keyEvent?.logicalKey == LogicalKeyboardKey.shiftLeft) {
+            if (value.logicalKey == LogicalKeyboardKey.keyA) {
+              controller.isShiftPressed.value = !controller.isShiftPressed.value;
+            }
           }
         }
-        if (value is KeyUpEvent) {
-          if (value.logicalKey == LogicalKeyboardKey.shiftLeft) {
-            controller.isShiftPressed.value = false;
-          }
-        }
+
+        controller.keyEvent = value;
       },
       child: Stack(
         children: [

@@ -10,7 +10,7 @@ import '../controller/bus_controller.dart';
 class BusVariantWidget extends GetView<BusController> {
   const BusVariantWidget({super.key});
 
-  BusVariants? get busVariant => controller.busVariant.value;
+  BusVariantModel? get busVariant => controller.busVariant.value;
 
   @override
   Widget build(BuildContext context) {
@@ -45,69 +45,69 @@ class BusVariantWidget extends GetView<BusController> {
                     spacing: 14,
                     children: [
                       const Center(child: Headline('Add Bus Variant', size: 14)),
-                      GetBuilder<BusController>(
-                          id: "time",
-                          builder: (_) {
-                            return Row(
-                              spacing: 10,
-                              children: [
-                                const Headline('From', size: 14),
-                                InkWell(
-                                  onTap: () {
-                                    selectTime(context, busVariant!.fromTime).then((res) {
-                                      busVariant!.fromTime = res;
-                                      controller.update(['time']);
-                                    });
-                                  },
-                                  child: Container(
-                                    margin: const EdgeInsets.all(4.0),
-                                    padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(4.0),
-                                      border: Border.all(color: Colors.grey),
-                                    ),
-                                    child: Headline(busVariant!.fromTime?.format(context) ?? "Start Time"),
-                                  ),
-                                ),
-                                const Headline('To', size: 14),
-                                InkWell(
-                                  onTap: () {
-                                    selectTime(context, busVariant!.toTime).then((res) {
-                                      busVariant!.toTime = res;
-                                      controller.update(['time']);
-                                    });
-                                  },
-                                  child: Container(
-                                    margin: const EdgeInsets.all(4.0),
-                                    padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(4.0),
-                                      border: Border.all(color: Colors.grey),
-                                    ),
-                                    child: Headline(busVariant!.toTime?.format(context) ?? "End Time"),
-                                  ),
-                                ),
-                              ],
-                            );
-                          }),
+                      // GetBuilder<BusController>(
+                      //     id: "time",
+                      //     builder: (_) {
+                      //       return Row(
+                      //         spacing: 10,
+                      //         children: [
+                      //           const Headline('From', size: 14),
+                      //           InkWell(
+                      //             onTap: () {
+                      //               selectTime(context, busVariant!.fromTime).then((res) {
+                      //                 busVariant!.fromTime = res;
+                      //                 controller.update(['time']);
+                      //               });
+                      //             },
+                      //             child: Container(
+                      //               margin: const EdgeInsets.all(4.0),
+                      //               padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                      //               decoration: BoxDecoration(
+                      //                 borderRadius: BorderRadius.circular(4.0),
+                      //                 border: Border.all(color: Colors.grey),
+                      //               ),
+                      //               child: Headline(busVariant!.fromTime?.format(context) ?? "Start Time"),
+                      //             ),
+                      //           ),
+                      //           const Headline('To', size: 14),
+                      //           InkWell(
+                      //             onTap: () {
+                      //               selectTime(context, busVariant!.toTime).then((res) {
+                      //                 busVariant!.toTime = res;
+                      //                 controller.update(['time']);
+                      //               });
+                      //             },
+                      //             child: Container(
+                      //               margin: const EdgeInsets.all(4.0),
+                      //               padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                      //               decoration: BoxDecoration(
+                      //                 borderRadius: BorderRadius.circular(4.0),
+                      //                 border: Border.all(color: Colors.grey),
+                      //               ),
+                      //               child: Headline(busVariant!.toTime?.format(context) ?? "End Time"),
+                      //             ),
+                      //           ),
+                      //         ],
+                      //       );
+                      //     }),
                       Row(
                         children: [
-                          Expanded(
-                            child: TextField(
-                              controller: TextEditingController(text: busVariant!.frequency.toString()),
-                              style: const TextStyle(color: appWhite, fontSize: 13),
-                              cursorColor: Colors.white,
-                              decoration: const InputDecoration.collapsed(hintText: "Frequency ..."),
-                              onChanged: (value) {
-                                busVariant!.frequency = int.tryParse(value) ?? 5;
-                              },
-                            ),
-                          ),
+                          // Expanded(
+                          //   child: TextField(
+                          //     controller: TextEditingController(text: busVariant!.frequency.toString()),
+                          //     style: const TextStyle(color: appWhite, fontSize: 13),
+                          //     cursorColor: Colors.white,
+                          //     decoration: const InputDecoration.collapsed(hintText: "Frequency ..."),
+                          //     onChanged: (value) {
+                          //       busVariant!.frequency = int.tryParse(value) ?? 5;
+                          //     },
+                          //   ),
+                          // ),
                           GetBuilder<BusController>(
                             id: 'busMarker',
                             builder: (context) {
                               print("object");
-                              return Headline(busVariant!.route.length, size: 14, color: appWhite);
+                              return Headline(busVariant!.stops.length, size: 14, color: appWhite);
                             },
                           ),
                         ],
@@ -122,10 +122,10 @@ class BusVariantWidget extends GetView<BusController> {
                               DayType.values.length,
                               (index) {
                                 final variant = DayType.values[index];
-                                bool isSelected = variant == busVariant!.dayType; // Example selection logic
+                                bool isSelected = variant == busVariant!.activeDays; // Example selection logic
                                 return InkWell(
                                   onTap: () {
-                                    controller.busVariant.value!.dayType = variant;
+                                    controller.busVariant.value!.activeDays = variant;
                                     controller.update(['dayType']);
                                   },
                                   child: Container(
@@ -147,44 +147,9 @@ class BusVariantWidget extends GetView<BusController> {
                           );
                         },
                       ),
-                      GetBuilder<BusController>(
-                        id: "type",
-                        builder: (context) {
-                          return Wrap(
-                            spacing: 8,
-                            runSpacing: 4,
-                            children: List.generate(
-                              VariantType.values.length,
-                              (index) {
-                                final type = VariantType.values[index];
-                                bool isSelected = type == busVariant!.type; // Example selection logic
-                                return InkWell(
-                                  onTap: () {
-                                    controller.busVariant.value!.type = type;
-                                    controller.update(['type']);
-                                  },
-                                  child: Container(
-                                    margin: const EdgeInsets.all(4.0),
-                                    padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-                                    decoration: BoxDecoration(
-                                      color: isSelected ? Colors.green : null,
-                                      borderRadius: BorderRadius.circular(4.0),
-                                      border: Border.all(color: isSelected ? Colors.transparent : Colors.grey),
-                                    ),
-                                    child: Headline(
-                                      type.name.toUpperCase(),
-                                      size: 10,
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                          );
-                        },
-                      ),
                       InkWell(
                         onTap: () {
-                          // controller.saveStop();
+                          controller.saveVariant();
                         },
                         child: Container(
                           alignment: Alignment.center,
@@ -193,13 +158,14 @@ class BusVariantWidget extends GetView<BusController> {
                             color: Colors.green,
                           ),
                           padding: const EdgeInsets.symmetric(vertical: 8),
-                          child: const Headline("UPDATE"),
+                          child: Headline(busVariant!.id == '' ? "Add" : "UPDATE"),
                         ),
                       ),
                       InkWell(
                         onTap: () {
                           controller.busVariant.value = null;
                           controller.variantOffset.value = const Offset(200, 150);
+                          controller.update(['busMarker']);
                         },
                         child: const Center(
                           child: Headline(
@@ -254,3 +220,5 @@ class BusVariantWidget extends GetView<BusController> {
     );
   }
 }
+
+  // 

@@ -99,7 +99,7 @@ class Responce {
       data: vv['data'] ?? vv,
       status: status,
       msg: vv['msg'] ?? "Not Provided",
-      error: vv['error'] ?? "Not P  rovided",
+      error: vv['error'] ?? "Not Provided",
       paginaton: Pagination.fromJson(vv['pagination'] ?? {}),
     );
   }

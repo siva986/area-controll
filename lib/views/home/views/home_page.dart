@@ -52,9 +52,11 @@ class HomePage extends GetView<HomeController> {
                           areaCrtl.addSelectionIntoPolygon(point);
                         },
                         onPointerHover: (event, point) {
-                          controller.curcerPosition.value = event.localPosition;
-                          areaCrtl.updatePolyPoint(point);
-                          stopCrtl.updateStopLocation(point);
+                          controller.debounceHover.call(() {
+                            controller.curcerPosition.value = event.localPosition;
+                            areaCrtl.updatePolyPoint(point);
+                            stopCrtl.updateStopLocation(point);
+                          });
                         },
                         onPositionChanged: (camera, hasGesture) {
                           controller.saveCurrentPosition(camera);
@@ -314,62 +316,89 @@ class HomePage extends GetView<HomeController> {
       GetBuilder<BusController>(
         id: 'busMarker',
         builder: (context) {
-          return busCrtl.busVariant.value != null
-              ? PolylineLayer(
-                  polylines: [
-                    Polyline(
-                      points: busCrtl.busVariant.value!.route.map((e) => e.geo!.coordinates).toList(),
-                      color: Colors.red,
-                      strokeWidth: 4,
-                    ),
-                  ],
-                )
-              : const SizedBox.shrink();
+          final busVariant = busCrtl.busVariant.value;
+          if (busVariant?.stops.isEmpty ?? true) return const SizedBox.shrink();
+
+          // Map for faster lookup
+          final stopMap = {for (var stop in busCrtl.stopLst) stop.id: stop};
+
+          final stopPoints = <LatLng>[];
+          for (var stopRef in busVariant!.stops) {
+            final stop = stopMap[stopRef.id];
+            if (stop?.geo?.coordinates != null) {
+              stopPoints.add(stop!.geo!.coordinates);
+            }
+          }
+
+          if (stopPoints.isEmpty) return const SizedBox.shrink();
+
+          return PolylineLayer(
+            polylines: [
+              Polyline(
+                points: stopPoints,
+                color: Colors.red,
+                strokeWidth: 4,
+              ),
+            ],
+          );
         },
       ),
       Obx(
         () {
-          // StopsModel? stop = busCrtl.stop.value;
-          return MarkerLayer(
-            markers: [
-              ...List.generate(
-                busCrtl.stopLst.length,
-                (index) {
-                  StopsModel stop0 = busCrtl.stopLst[index];
-                  return Marker(
-                    width: 10,
-                    height: 10,
-                    point: stop0.geo!.coordinates,
-                    child: GetBuilder<BusController>(
-                        id: 'busMarker',
-                        builder: (context) {
-                          bool isSelected = busCrtl.busVariant.value?.route.any((e) => e.id == stop0.id) == true;
-                          return InkWell(
-                            onTap: () {
-                              if (busCrtl.busVariant.value != null) {
-                                if (busCrtl.isShiftPressed.value) {
-                                  busCrtl.busVariant.value!.route = busCrtl.busVariant.value!.route.toList();
-                                  busCrtl.busVariant.value!.route.add(stop0);
+          if (busCrtl.busVariant.value != null) {
+            return MarkerLayer(
+              markers: [
+                ...List.generate(
+                  busCrtl.stopLst.length,
+                  (index) {
+                    StopsModel stop0 = busCrtl.stopLst[index];
+                    return Marker(
+                      width: 10,
+                      height: 10,
+                      point: stop0.geo!.coordinates,
+                      child: GetBuilder<BusController>(
+                          id: 'busMarker',
+                          builder: (context) {
+                            bool isSelected = busCrtl.busVariant.value?.stops.any((e) => e.id == stop0.id) == true;
+                            return InkWell(
+                              onTap: () {
+                                if (busCrtl.busVariant.value != null) {
+                                  if (busCrtl.isShiftPressed.value) {
+                                    busCrtl.busVariant.value!.stops = busCrtl.busVariant.value!.stops.toList();
 
-                                  busCrtl.update(['busMarker']);
-                                  print(busCrtl.busVariant.value!.route);
+                                    if (busCrtl.busVariant.value!.stops.any((e) => e.id != stop0.id)) {
+                                      busCrtl.busVariant.value!.stops.add(stop0);
+                                    }
+                                    if (busCrtl.busVariant.value!.stops.isEmpty) {
+                                      busCrtl.busVariant.value!.stops.add(stop0);
+                                    }
+
+                                    busCrtl.update(['busMarker']);
+                                    print(busCrtl.busVariant.value!.stops);
+                                  }
                                 }
-                              }
-                            },
-                            child: Tooltip(
-                              triggerMode: TooltipTriggerMode.longPress,
-                              message: stop0.name,
-                              child: LocationIcon(
-                                color: isSelected ? Colors.redAccent : null,
+                              },
+                              onDoubleTap: () {
+                                busCrtl.busVariant.value!.stops = busCrtl.busVariant.value!.stops.toList();
+                                busCrtl.busVariant.value!.stops.removeWhere((e) => e.id == stop0.id);
+                                busCrtl.update(['busMarker']);
+                              },
+                              child: Tooltip(
+                                triggerMode: TooltipTriggerMode.longPress,
+                                message: stop0.name,
+                                child: LocationIcon(
+                                  color: isSelected ? Colors.redAccent : null,
+                                ),
                               ),
-                            ),
-                          );
-                        }),
-                  );
-                },
-              )
-            ],
-          );
+                            );
+                          }),
+                    );
+                  },
+                )
+              ],
+            );
+          }
+          return const SizedBox.shrink();
         },
       ),
     ];

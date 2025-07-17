@@ -168,7 +168,7 @@ class AddBusWidget extends GetView<BusController> {
                             if (route?.id == "") {
                               return;
                             }
-                            controller.busVariant.value = BusVariants();
+                            controller.busVariant.value = BusVariantModel(route: route!.id);
                             controller.update(['variants']);
                           },
                           child: Container(
@@ -198,7 +198,8 @@ class AddBusWidget extends GetView<BusController> {
                                 (index) {
                                   return InkWell(
                                     onTap: () {
-                                      controller.busVariant.value = route!.variants[index];
+                                      controller.getVariant(route!.variants[index].id);
+                                      // controller.busVariant.value = route!.variants[index];
                                     },
                                     child: Container(
                                       decoration: BoxDecoration(

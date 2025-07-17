@@ -24,13 +24,27 @@ enum DayType {
   saturday,
   sunday,
   holiday,
-  daily,
+  daily;
+
+  static DayType fromName(String? name) {
+    return DayType.values.firstWhere(
+      (e) => e.name == name,
+      orElse: () => DayType.daily,
+    );
+  }
 }
 
 enum VariantType {
   normal,
   firstBus,
-  lastBus,
+  lastBus;
+
+  static VariantType fromName(String? name) {
+    return VariantType.values.firstWhere(
+      (e) => e.name == name,
+      orElse: () => VariantType.normal,
+    );
+  }
 }
 
 enum BusType {
@@ -39,7 +53,7 @@ enum BusType {
   metroBus,
   airportBus;
 
-  static BusType fromName(String name) {
+  static BusType fromName(String? name) {
     return BusType.values.firstWhere(
       (e) => e.name == name,
       orElse: () => BusType.bus,
