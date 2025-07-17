@@ -95,38 +95,37 @@ class AllRoutesWidget extends GetView<BusController> {
                             if (controller.busesLst.isEmpty) {
                               return const Center(child: Headline("No-Buses Available"));
                             }
-                            return Expanded(
-                              child: NotificationListener(
-                                onNotification: (notification) {
-                                  if (notification is ScrollEndNotification && notification.metrics.atEdge) {
-                                    controller.getBuses(false);
-                                    return true;
-                                  }
-                                  return false;
+                            return NotificationListener(
+                              onNotification: (notification) {
+                                if (notification is ScrollEndNotification && notification.metrics.atEdge) {
+                                  controller.getBuses(false);
+                                  return true;
+                                }
+                                return false;
+                              },
+                              child: ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: controller.busesLst.length,
+                                itemBuilder: (context, index) {
+                                  final route = controller.busesLst[index];
+                                  return Obx(() {
+                                    final isSelected = controller.busDetails.value?.id == route.id;
+                                    return ListTile(
+                                      shape: isSelected
+                                          ? RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(8),
+                                              side: const BorderSide(color: Colors.green, width: 1),
+                                            )
+                                          : null,
+                                      title: Headline(route.name),
+                                      subtitle: Headline(route.description, size: 10, color: Colors.grey),
+                                      onTap: () {
+                                        controller.getBus(route.id);
+                                        // controller.busDetails.value = route;
+                                      },
+                                    );
+                                  });
                                 },
-                                child: ListView.builder(
-                                  itemCount: controller.busesLst.length,
-                                  itemBuilder: (context, index) {
-                                    final route = controller.busesLst[index];
-                                    return Obx(() {
-                                      final isSelected = controller.busDetails.value?.id == route.id;
-                                      return ListTile(
-                                        shape: isSelected
-                                            ? RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(8),
-                                                side: const BorderSide(color: Colors.green, width: 1),
-                                              )
-                                            : null,
-                                        title: Headline(route.name),
-                                        subtitle: Headline(route.description, size: 10, color: Colors.grey),
-                                        onTap: () {
-                                          controller.getBus(route.id);
-                                          // controller.busDetails.value = route;
-                                        },
-                                      );
-                                    });
-                                  },
-                                ),
                               ),
                             );
                           })),
